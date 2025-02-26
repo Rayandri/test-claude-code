@@ -9,6 +9,7 @@ type Player = {
   wins: number;
   losses: number;
   gamesPlayed: number;
+  avatarUrl?: string; // URL de l'image de profil
 };
 
 type Match = {
@@ -18,10 +19,12 @@ type Match = {
     id: string;
     name: string;
     score: number;
+    avatarUrl?: string;
   }[];
   winner?: {
     id: string;
     name: string;
+    avatarUrl?: string;
   };
 };
 
@@ -140,7 +143,25 @@ export default function StatsPage() {
                   <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#4facfe]/50 to-transparent"></div>
                   
                   <h3 className="text-[#a0aec0] text-sm mb-1">Meilleur joueur</h3>
-                  <p className="font-bold text-[#e2e8f0]">{bestPlayer.name}</p>
+                  <div className="flex items-center">
+                    {bestPlayer.avatarUrl ? (
+                      <div className="mr-2 w-8 h-8 rounded-full overflow-hidden border-2 border-[#303f60]/30">
+                        <img 
+                          src={bestPlayer.avatarUrl} 
+                          alt={`Avatar de ${bestPlayer.name}`}
+                          className="w-full h-full object-cover" 
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=?';
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="mr-2 w-8 h-8 rounded-full bg-[#1a253a] flex items-center justify-center border-2 border-[#303f60]/30 text-[#4facfe] text-xs">
+                        {bestPlayer.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <p className="font-bold text-[#e2e8f0]">{bestPlayer.name}</p>
+                  </div>
                   <p className="text-[#ffa500] text-sm mt-1 group-hover:scale-110 transform transition-transform origin-left duration-300">
                     {bestPlayer.winRate.toFixed(0)}% de victoires
                   </p>
@@ -153,7 +174,25 @@ export default function StatsPage() {
                   
                   <h3 className="text-[#a0aec0] text-sm mb-1">Record de points</h3>
                   <div className="flex justify-between items-center">
-                    <p className="font-bold text-[#e2e8f0]">{highestScoringPlayer.name}</p>
+                    <div className="flex items-center">
+                      {highestScoringPlayer.avatarUrl ? (
+                        <div className="mr-2 w-8 h-8 rounded-full overflow-hidden border-2 border-[#303f60]/30">
+                          <img 
+                            src={highestScoringPlayer.avatarUrl} 
+                            alt={`Avatar de ${highestScoringPlayer.name}`}
+                            className="w-full h-full object-cover" 
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=?';
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div className="mr-2 w-8 h-8 rounded-full bg-[#1a253a] flex items-center justify-center border-2 border-[#303f60]/30 text-[#4facfe] text-xs">
+                          {highestScoringPlayer.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <p className="font-bold text-[#e2e8f0]">{highestScoringPlayer.name}</p>
+                    </div>
                     <p className="text-[#ffa500] font-bold text-xl group-hover:scale-110 transform transition-transform duration-300">
                       {highestScoringPlayer.highestScore} points
                     </p>
@@ -179,7 +218,25 @@ export default function StatsPage() {
                       className="bg-[#172032] p-4 rounded-xl shadow-[inset_0_1px_1px_#ffffff08] hover:bg-[#1a253a] transition-colors border border-[#303f60]/10"
                     >
                       <div className="flex justify-between items-center mb-2">
-                        <span className="font-medium text-lg text-[#e2e8f0]">{player.name}</span>
+                        <div className="flex items-center">
+                          {player.avatarUrl ? (
+                            <div className="mr-3 w-10 h-10 rounded-full overflow-hidden border-2 border-[#303f60]/30">
+                              <img 
+                                src={player.avatarUrl} 
+                                alt={`Avatar de ${player.name}`}
+                                className="w-full h-full object-cover" 
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=?';
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <div className="mr-3 w-10 h-10 rounded-full bg-[#1a253a] flex items-center justify-center border-2 border-[#303f60]/30 text-[#4facfe]">
+                              {player.name.charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                          <span className="font-medium text-lg text-[#e2e8f0]">{player.name}</span>
+                        </div>
                         <span className="text-sm bg-[#1a253a] px-3 py-1 rounded-full border border-[#303f60]/30 text-[#a0aec0]">
                           {player.gamesPlayed} parties
                         </span>

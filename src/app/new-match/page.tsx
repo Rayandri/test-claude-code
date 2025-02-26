@@ -10,6 +10,7 @@ type Player = {
   wins: number;
   losses: number;
   gamesPlayed: number;
+  avatarUrl?: string; // URL de l'image de profil
 };
 
 type MatchPlayer = {
@@ -17,6 +18,7 @@ type MatchPlayer = {
   name: string;
   score: number;
   selected: boolean;
+  avatarUrl?: string;
 };
 
 type Match = {
@@ -26,10 +28,12 @@ type Match = {
     id: string;
     name: string;
     score: number;
+    avatarUrl?: string;
   }[];
   winner?: {
     id: string;
     name: string;
+    avatarUrl?: string;
   };
 };
 
@@ -50,7 +54,8 @@ export default function NewMatchPage() {
           id: player.id,
           name: player.name,
           score: 0,
-          selected: false
+          selected: false,
+          avatarUrl: player.avatarUrl
         }))
       );
     }
@@ -89,12 +94,16 @@ export default function NewMatchPage() {
   const finishMatch = () => {
     // Find player with highest score
     let highestScore = -1;
-    let winner: { id: string; name: string } | null = null;
+    let winner: { id: string; name: string; avatarUrl?: string } | null = null;
     
     selectedPlayers.forEach(player => {
       if (player.score > highestScore) {
         highestScore = player.score;
-        winner = { id: player.id, name: player.name };
+        winner = { 
+          id: player.id, 
+          name: player.name,
+          avatarUrl: player.avatarUrl
+        };
       }
     });
     
@@ -104,7 +113,12 @@ export default function NewMatchPage() {
     const match: Match = {
       id: Date.now().toString(),
       date: new Date().toISOString(),
-      players: selectedPlayers.map(p => ({ id: p.id, name: p.name, score: p.score })),
+      players: selectedPlayers.map(p => ({ 
+        id: p.id, 
+        name: p.name, 
+        score: p.score,
+        avatarUrl: p.avatarUrl
+      })),
       winner: winner
     };
     
@@ -173,6 +187,24 @@ export default function NewMatchPage() {
                           <span className="text-xs text-[#4facfe]">✓</span>
                         )}
                       </div>
+                      
+                      {player.avatarUrl ? (
+                        <div className="mr-3 w-8 h-8 rounded-full overflow-hidden border-2 border-[#303f60]/30">
+                          <img 
+                            src={player.avatarUrl} 
+                            alt={`Avatar de ${player.name}`}
+                            className="w-full h-full object-cover" 
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=?';
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div className="mr-3 w-8 h-8 rounded-full bg-[#1a253a] flex items-center justify-center border-2 border-[#303f60]/30 text-[#4facfe] text-xs">
+                          {player.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      
                       <span className="font-medium text-[#e2e8f0]">{player.name}</span>
                     </div>
                   ))}
@@ -224,7 +256,25 @@ export default function NewMatchPage() {
                   <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#4facfe]/50 to-transparent"></div>
                   
                   <div className="flex justify-between items-center mb-4">
-                    <span className="font-medium text-lg text-[#e2e8f0]">{player.name}</span>
+                    <div className="flex items-center">
+                      {player.avatarUrl ? (
+                        <div className="mr-3 w-10 h-10 rounded-full overflow-hidden border-2 border-[#303f60]/30">
+                          <img 
+                            src={player.avatarUrl} 
+                            alt={`Avatar de ${player.name}`}
+                            className="w-full h-full object-cover" 
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=?';
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div className="mr-3 w-10 h-10 rounded-full bg-[#1a253a] flex items-center justify-center border-2 border-[#303f60]/30 text-[#4facfe]">
+                          {player.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <span className="font-medium text-lg text-[#e2e8f0]">{player.name}</span>
+                    </div>
                     <span className="text-2xl font-bold bg-[#172032] px-6 py-1.5 rounded-xl border border-[#303f60]/30 text-[#4facfe]">
                       {player.score}
                     </span>

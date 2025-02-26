@@ -10,10 +10,12 @@ type Match = {
     id: string;
     name: string;
     score: number;
+    avatarUrl?: string;
   }[];
   winner?: {
     id: string;
     name: string;
+    avatarUrl?: string;
   };
 };
 
@@ -74,7 +76,21 @@ export default function MatchesPage() {
                     </span>
                     {match.winner && (
                       <span className="text-[#ffa500] flex items-center bg-[#ffa500]/10 px-3 py-1 rounded-full text-sm border border-[#ffa500]/20">
-                        <span className="mr-1">🏆</span> 
+                        <span className="mr-1">🏆</span>
+                        {match.winner.avatarUrl ? (
+                          <img 
+                            src={match.winner.avatarUrl}
+                            alt={`Avatar de ${match.winner.name}`}
+                            className="w-5 h-5 rounded-full mr-1 object-cover border border-[#ffa500]/30"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=?';
+                            }}
+                          />
+                        ) : (
+                          <span className="w-5 h-5 rounded-full mr-1 bg-[#2d3748] flex items-center justify-center text-xs border border-[#ffa500]/30">
+                            {match.winner.name.charAt(0).toUpperCase()}
+                          </span>
+                        )}
                         {match.winner.name}
                       </span>
                     )}
@@ -91,7 +107,25 @@ export default function MatchesPage() {
                           : 'bg-[#172032] border border-[#303f60]/10'
                       }`}
                     >
-                      <span className="font-medium text-[#e2e8f0]">{player.name}</span>
+                      <div className="flex items-center">
+                        {player.avatarUrl ? (
+                          <div className="mr-3 w-8 h-8 rounded-full overflow-hidden border-2 border-[#303f60]/30">
+                            <img 
+                              src={player.avatarUrl} 
+                              alt={`Avatar de ${player.name}`}
+                              className="w-full h-full object-cover" 
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=?';
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <div className="mr-3 w-8 h-8 rounded-full bg-[#1a253a] flex items-center justify-center border-2 border-[#303f60]/30 text-[#4facfe] text-xs">
+                            {player.name.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <span className="font-medium text-[#e2e8f0]">{player.name}</span>
+                      </div>
                       <span className={`font-bold px-3 py-1 rounded-lg ${
                         match.winner && player.id === match.winner.id 
                           ? 'bg-[#ffa500]/20 text-[#ffa500]' 

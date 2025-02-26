@@ -10,6 +10,7 @@ type Player = {
   wins: number;
   losses: number;
   gamesPlayed: number;
+  avatarUrl?: string; // URL de l'image de profil
 };
 
 type Match = {
@@ -19,10 +20,12 @@ type Match = {
     id: string;
     name: string;
     score: number;
+    avatarUrl?: string;
   }[];
   winner?: {
     id: string;
     name: string;
+    avatarUrl?: string;
   };
 };
 
@@ -104,6 +107,24 @@ export default function Home() {
                     <span className="font-bold text-[#ffa500] mr-3 bg-[#2d3748] w-7 h-7 flex items-center justify-center rounded-full border border-[#ffa500]/20 text-sm">
                       {index + 1}
                     </span>
+                    
+                    {player.avatarUrl ? (
+                      <div className="mr-3 w-8 h-8 rounded-full overflow-hidden border-2 border-[#303f60]/30">
+                        <img 
+                          src={player.avatarUrl} 
+                          alt={`Avatar de ${player.name}`}
+                          className="w-full h-full object-cover" 
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=?';
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="mr-3 w-8 h-8 rounded-full bg-[#1a253a] flex items-center justify-center border-2 border-[#303f60]/30 text-[#4facfe] text-xs">
+                        {player.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    
                     <span className="text-[#e2e8f0]">{player.name}</span>
                   </div>
                   <div className="flex gap-2 text-sm">
