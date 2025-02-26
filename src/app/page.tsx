@@ -1,12 +1,11 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Player, Match, storage, handleAvatarError } from "@/types";
+import { Player, storage, handleAvatarError } from "@/types";
 
 export default function Home() {
-  const router = useRouter();
   const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
