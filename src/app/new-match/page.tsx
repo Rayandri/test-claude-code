@@ -3,39 +3,15 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
-type Player = {
-  id: string;
-  name: string;
-  wins: number;
-  losses: number;
-  gamesPlayed: number;
-  avatarUrl?: string; // URL de l'image de profil
-};
-
-type MatchPlayer = {
-  id: string;
-  name: string;
-  score: number;
-  selected: boolean;
-  avatarUrl?: string;
-};
-
-type Match = {
-  id: string;
-  date: string;
-  players: {
-    id: string;
-    name: string;
-    score: number;
-    avatarUrl?: string;
-  }[];
-  winner?: {
-    id: string;
-    name: string;
-    avatarUrl?: string;
-  };
-};
+import { 
+  Player, 
+  MatchPlayer, 
+  Match,
+  MatchPlayerHistory,
+  Winner,
+  storage, 
+  handleAvatarError 
+} from "@/types";
 
 export default function NewMatchPage() {
   const router = useRouter();
@@ -45,20 +21,17 @@ export default function NewMatchPage() {
 
   useEffect(() => {
     // Load players from localStorage
-    const savedPlayers = localStorage.getItem("billiardPlayers");
-    if (savedPlayers) {
-      const players = JSON.parse(savedPlayers);
-      setAllPlayers(players);
-      setMatchPlayers(
-        players.map((player: Player) => ({
-          id: player.id,
-          name: player.name,
-          score: 0,
-          selected: false,
-          avatarUrl: player.avatarUrl
-        }))
-      );
-    }
+    const players = storage.getPlayers();
+    setAllPlayers(players);
+    setMatchPlayers(
+      players.map((player: Player) => ({
+        id: player.id,
+        name: player.name,
+        score: 0,
+        selected: false,
+        avatarUrl: player.avatarUrl
+      }))
+    );
   }, []);
 
   const togglePlayerSelection = (id: string) => {
@@ -94,7 +67,7 @@ export default function NewMatchPage() {
   const finishMatch = () => {
     // Find player with highest score
     let highestScore = -1;
-    let winner: { id: string; name: string; avatarUrl?: string } | null = null;
+    let winner: Winner | null = null;
     
     selectedPlayers.forEach(player => {
       if (player.score > highestScore) {
@@ -123,9 +96,8 @@ export default function NewMatchPage() {
     };
     
     // Save match to localStorage
-    const savedMatches = localStorage.getItem("billiardMatches");
-    const matches = savedMatches ? JSON.parse(savedMatches) : [];
-    localStorage.setItem("billiardMatches", JSON.stringify([...matches, match]));
+    const matches = storage.getMatches();
+    storage.setMatches([...matches, match]);
     
     // Update player stats
     const updatedPlayers = allPlayers.map(player => {
@@ -140,7 +112,7 @@ export default function NewMatchPage() {
       };
     });
     
-    localStorage.setItem("billiardPlayers", JSON.stringify(updatedPlayers));
+    storage.setPlayers(updatedPlayers);
     
     // Navigate to match history
     router.push("/matches");
@@ -194,9 +166,7 @@ export default function NewMatchPage() {
                             src={player.avatarUrl} 
                             alt={`Avatar de ${player.name}`}
                             className="w-full h-full object-cover" 
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=?';
-                            }}
+                            onError={handleAvatarError}
                           />
                         </div>
                       ) : (
@@ -263,9 +233,7 @@ export default function NewMatchPage() {
                             src={player.avatarUrl} 
                             alt={`Avatar de ${player.name}`}
                             className="w-full h-full object-cover" 
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=?';
-                            }}
+                            onError={handleAvatarError}
                           />
                         </div>
                       ) : (

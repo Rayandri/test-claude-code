@@ -3,31 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
-type Player = {
-  id: string;
-  name: string;
-  wins: number;
-  losses: number;
-  gamesPlayed: number;
-  avatarUrl?: string; // URL de l'image de profil
-};
-
-type Match = {
-  id: string;
-  date: string;
-  players: {
-    id: string;
-    name: string;
-    score: number;
-    avatarUrl?: string;
-  }[];
-  winner?: {
-    id: string;
-    name: string;
-    avatarUrl?: string;
-  };
-};
+import { Player, Match, storage, handleAvatarError } from "@/types";
 
 export default function Home() {
   const router = useRouter();
@@ -35,10 +11,7 @@ export default function Home() {
 
   useEffect(() => {
     // Load players from localStorage
-    const savedPlayers = localStorage.getItem("billiardPlayers");
-    if (savedPlayers) {
-      setPlayers(JSON.parse(savedPlayers));
-    }
+    setPlayers(storage.getPlayers());
   }, []);
 
   // Calculate leaderboard by sorting players by wins
@@ -114,9 +87,7 @@ export default function Home() {
                           src={player.avatarUrl} 
                           alt={`Avatar de ${player.name}`}
                           className="w-full h-full object-cover" 
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=?';
-                          }}
+                          onError={handleAvatarError}
                         />
                       </div>
                     ) : (

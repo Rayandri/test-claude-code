@@ -2,15 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-
-type Player = {
-  id: string;
-  name: string;
-  wins: number;
-  losses: number;
-  gamesPlayed: number;
-  avatarUrl?: string; // URL de l'image de profil
-};
+import { Player, storage, handleAvatarError } from "@/types";
 
 export default function PlayersPage() {
   const [players, setPlayers] = useState<Player[]>([]);
@@ -22,14 +14,11 @@ export default function PlayersPage() {
 
   useEffect(() => {
     // Load players from localStorage
-    const savedPlayers = localStorage.getItem("billiardPlayers");
-    if (savedPlayers) {
-      setPlayers(JSON.parse(savedPlayers));
-    }
+    setPlayers(storage.getPlayers());
   }, []);
 
   const savePlayersToStorage = (updatedPlayers: Player[]) => {
-    localStorage.setItem("billiardPlayers", JSON.stringify(updatedPlayers));
+    storage.setPlayers(updatedPlayers);
     setPlayers(updatedPlayers);
   };
 
@@ -126,9 +115,7 @@ export default function PlayersPage() {
                     src={newAvatarUrl} 
                     alt="Avatar preview" 
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=?';
-                    }}
+                    onError={handleAvatarError}
                   />
                 </div>
               </div>
@@ -184,9 +171,7 @@ export default function PlayersPage() {
                               src={editAvatarUrl} 
                               alt="Avatar preview" 
                               className="w-full h-full object-cover"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=?';
-                              }}
+                              onError={handleAvatarError}
                             />
                           </div>
                         </div>
@@ -216,9 +201,7 @@ export default function PlayersPage() {
                               src={player.avatarUrl} 
                               alt={`Avatar de ${player.name}`}
                               className="w-full h-full object-cover" 
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=?';
-                              }}
+                              onError={handleAvatarError}
                             />
                           </div>
                         ) : (
