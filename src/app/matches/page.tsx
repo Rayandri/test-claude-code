@@ -1,7 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+
+type Player = {
+  id: string;
+  name: string;
+  wins: number;
+  losses: number;
+  gamesPlayed: number;
+  avatarUrl?: string;
+};
 
 type Match = {
   id: string;
@@ -19,20 +29,66 @@ type Match = {
   };
 };
 
-export default function MatchesPage() {
+type PlayerStats = Player & {
+  winRate: number;
+  averageScore: number;
+  highestScore: number;
+};
+
+export default function StatsPage() {
   const [matches, setMatches] = useState<Match[]>([]);
+  const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load matches from localStorage
+    // Load players and matches from localStorage
+    const savedPlayers = localStorage.getItem("billiardPlayers");
     const savedMatches = localStorage.getItem("billiardMatches");
-    if (savedMatches) {
-      const parsedMatches = JSON.parse(savedMatches);
-      // Sort by date, newest first
-      parsedMatches.sort((a: Match, b: Match) => 
-        new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
-      setMatches(parsedMatches);
+    
+    const loadedPlayers: Player[] = savedPlayers ? JSON.parse(savedPlayers) : [];
+    const loadedMatches: Match[] = savedMatches ? JSON.parse(savedMatches) : [];
+    
+    setMatches(loadedMatches);
+    
+    // Calculate extended stats
+    if (loadedPlayers.length > 0 && loadedMatches.length > 0) {
+      const stats: PlayerStats[] = loadedPlayers.map((player: Player) => {
+        // Get all scores for this player from all matches
+        const playerScores: number[] = loadedMatches
+          .flatMap((match: Match) => 
+            match.players
+              .filter(p => p.id === player.id)
+              .map(p => p.score)
+          );
+        
+        // Calculate average and highest score
+        const totalScore: number = playerScores.reduce((sum: number, score: number) => sum + score, 0);
+        const averageScore: number = playerScores.length > 0 
+          ? totalScore / playerScores.length 
+          : 0;
+        const highestScore: number = playerScores.length > 0 
+          ? Math.max(...playerScores) 
+          : 0;
+        
+        // Calculate win rate
+        const winRate: number = player.gamesPlayed > 0 
+          ? (player.wins / player.gamesPlayed) * 100 
+          : 0;
+        
+        return {
+          ...player,
+          winRate,
+          averageScore,
+          highestScore
+        };
+      });
+      
+      setPlayerStats(stats);
+    } else {
+      setPlayerStats([]);
     }
+    
+    setLoading(false);
   }, []);
 
   // Format date for display
