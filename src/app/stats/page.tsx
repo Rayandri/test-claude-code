@@ -45,17 +45,17 @@ export default function StatsPage() {
     const savedPlayers = localStorage.getItem("billiardPlayers");
     const savedMatches = localStorage.getItem("billiardMatches");
     
-    const loadedPlayers = savedPlayers ? JSON.parse(savedPlayers) : [];
-    const loadedMatches = savedMatches ? JSON.parse(savedMatches) : [];
+    const loadedPlayers: Player[] = savedPlayers ? JSON.parse(savedPlayers) : [];
+    const loadedMatches: Match[] = savedMatches ? JSON.parse(savedMatches) : [];
     
     setPlayers(loadedPlayers);
     setMatches(loadedMatches);
     
     // Calculate extended stats
     if (loadedPlayers.length > 0 && loadedMatches.length > 0) {
-      const stats = loadedPlayers.map((player: Player) => {
+      const stats: PlayerStats[] = loadedPlayers.map((player: Player) => {
         // Get all scores for this player from all matches
-        const playerScores = loadedMatches
+        const playerScores: number[] = loadedMatches
           .flatMap((match: Match) => 
             match.players
               .filter(p => p.id === player.id)
@@ -63,16 +63,16 @@ export default function StatsPage() {
           );
         
         // Calculate average and highest score
-        const totalScore = playerScores.reduce((sum, score) => sum + score, 0);
-        const averageScore = playerScores.length > 0 
+        const totalScore: number = playerScores.reduce((sum: number, score: number) => sum + score, 0);
+        const averageScore: number = playerScores.length > 0 
           ? totalScore / playerScores.length 
           : 0;
-        const highestScore = playerScores.length > 0 
+        const highestScore: number = playerScores.length > 0 
           ? Math.max(...playerScores) 
           : 0;
         
         // Calculate win rate
-        const winRate = player.gamesPlayed > 0 
+        const winRate: number = player.gamesPlayed > 0 
           ? (player.wins / player.gamesPlayed) * 100 
           : 0;
         
@@ -85,23 +85,25 @@ export default function StatsPage() {
       });
       
       setPlayerStats(stats);
+    } else {
+      setPlayerStats([]);
     }
     
     setLoading(false);
   }, []);
 
   // Get total games played across all players
-  const totalGamesPlayed = matches.length;
+  const totalGamesPlayed: number = matches.length;
   
   // Find player with highest win rate
-  const bestPlayer = playerStats.length > 0 
+  const bestPlayer: PlayerStats | null = playerStats.length > 0 
     ? playerStats.reduce((prev, current) => 
         (prev.winRate > current.winRate) ? prev : current
       ) 
     : null;
   
   // Find player with highest score ever
-  const highestScoringPlayer = playerStats.length > 0 
+  const highestScoringPlayer: PlayerStats | null = playerStats.length > 0 
     ? playerStats.reduce((prev, current) => 
         (prev.highestScore > current.highestScore) ? prev : current
       ) 
